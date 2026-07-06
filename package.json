@@ -28,9 +28,13 @@
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json"
   },
   "dependencies": {
+    "dexie": "^4.4.4",
     "lucide-react": "^0.556.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "rxdb": "^17.3.0",
+    "rxdb-hooks": "^6.0.0",
+    "rxjs": "^7.8.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
@@ -42,6 +46,10 @@
     "esbuild": "^0.28.1",
     "typescript": "~5.9.3",
     "vite": "^8.1.3",
+    "vite-plugin-pwa": "^1.3.0",
     "vitest": "^4.0.14"
+  },
+  "overrides": {
+    "ws": "^8.20.2"
   }
 }

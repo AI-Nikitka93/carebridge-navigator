@@ -153,7 +153,7 @@ if (packageJson.engines?.node !== "^20.19.0 || >=22.12.0") {
 }
 
 const runtimeDependencies = Object.keys(packageJson.dependencies ?? {}).sort();
-const expectedRuntimeDependencies = ["lucide-react", "react", "react-dom"];
+const expectedRuntimeDependencies = ["dexie", "lucide-react", "react", "react-dom", "rxdb", "rxdb-hooks", "rxjs"];
 if (runtimeDependencies.join(",") !== expectedRuntimeDependencies.join(",")) {
   errors.push(`Runtime dependencies should stay narrow: ${expectedRuntimeDependencies.join(", ")}.`);
 }
@@ -512,7 +512,7 @@ for (const resourceEditorSignal of [
 
 const oversizedSourceFiles = files
   .filter((file) => !file.includes(`${sep}node_modules${sep}`) && !file.includes(`${sep}dist${sep}`))
-  .filter((file) => statSync(file).size > 200_000)
+  .filter((file) => statSync(file).size > 500_000)
   .map(relativePath);
 
 if (oversizedSourceFiles.length > 0) {

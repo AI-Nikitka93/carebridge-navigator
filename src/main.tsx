@@ -1,11 +1,31 @@
-import { StrictMode } from "react";
+import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { Provider } from "rxdb-hooks";
 import { App } from "./App";
+import { getDb, MyDatabase } from "./lib/db";
 import "./styles.css";
+
+function Root() {
+  const [db, setDb] = useState<MyDatabase | null>(null);
+  
+  useEffect(() => {
+    getDb().then(setDb);
+  }, []);
+
+  if (!db) {
+    return <div style={{ padding: 20 }}>Initializing secure database...</div>;
+  }
+
+  return (
+    <Provider db={db}>
+      <App />
+    </Provider>
+  );
+}
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <Root />
   </StrictMode>
 );
 
