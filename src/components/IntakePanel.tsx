@@ -1,8 +1,11 @@
+import { useState, useEffect, useRef } from "react";
 import type { ChangeEvent } from "react";
+import { ShieldAlert } from "lucide-react";
 import type { AccessBarrier, CareIntake, HealthConcern, WarningSign } from "../domain/careTypes";
 import { DEMO_SCENARIO_OPTIONS, DEMO_SCENARIO_STORIES } from "../domain/demoScenarios";
 import type { DemoScenarioKey } from "../domain/demoScenarios";
 import type { ScenarioSelection } from "../hooks/useNavigatorState";
+import { SwipeTriagePanel } from "./SwipeTriagePanel";
 
 const concernOptions: Array<{ value: HealthConcern; label: string }> = [
   { value: "maternal_follow_up", label: "Maternal follow-up" },
@@ -46,6 +49,10 @@ function toggleValue<T extends string>(values: T[], value: T): T[] {
 }
 
 export function IntakePanel({ intake, scenarioSelection, onChange, onLoadScenario }: IntakePanelProps) {
+  const [isHybridMode, setIsHybridMode] = useState(false);
+  const [showSwipePanel, setShowSwipePanel] = useState(false);
+  const [verifiedSigns, setVerifiedSigns] = useState<WarningSign[]>([]);
+
   const update = <K extends keyof CareIntake>(key: K, value: CareIntake[K]) =>
     onChange({ ...intake, [key]: value });
 
@@ -58,7 +65,49 @@ export function IntakePanel({ intake, scenarioSelection, onChange, onLoadScenari
 
   const updateDistance = (event: ChangeEvent<HTMLInputElement>) =>
     update("distanceKm", Number(event.target.value));
+  
+  // Sync verified signs when warning signs are removed in form or scenario changes
+  useEffect(() => {
+    setVerifiedSigns((prev) => prev.filter((s) => intake.warningSigns.includes(s)));
+  }, [intake.warningSigns]);
+
+  // Automatically trigger Swipe Panel when NEW warning signs are added
+  const lastWarningLength = useRef(intake.warningSigns.length);
+  useEffect(() => {
+    const unverified = intake.warningSigns.filter((s) => !verifiedSigns.includes(s));
+    if (unverified.length > 0 && intake.warningSigns.length > lastWarningLength.current) {
+      setShowSwipePanel(true);
+    }
+    lastWarningLength.current = intake.warningSigns.length;
+  }, [intake.warningSigns, verifiedSigns]);
+
   const scenarioStory = scenarioSelection === "custom" ? null : DEMO_SCENARIO_STORIES[scenarioSelection];
+  const pendingWarnings = intake.warningSigns.filter((s) => !verifiedSigns.includes(s));
+
+  if (showSwipePanel) {
+    return (
+      <SwipeTriagePanel
+        warningSigns={pendingWarnings}
+        onConfirm={(sign) => {
+          if (!verifiedSigns.includes(sign)) {
+            setVerifiedSigns((prev) => [...prev, sign]);
+          }
+        }}
+        onDismiss={(sign) => {
+          setVerifiedSigns((prev) => prev.filter((s) => s !== sign));
+          onChange({
+            ...intake,
+            warningSigns: intake.warningSigns.filter((s) => s !== sign)
+          });
+        }}
+        onClose={() => {
+          setShowSwipePanel(false);
+          setIsHybridMode(false);
+        }}
+        isHybridMode={isHybridMode}
+      />
+    );
+  }
 
   return (
     <section className="panel intake-panel" aria-labelledby="intake-title">
@@ -161,6 +210,25 @@ export function IntakePanel({ intake, scenarioSelection, onChange, onLoadScenari
         onToggle={(value) => update("warningSigns", toggleValue(intake.warningSigns, value))}
       />
 
+      {pendingWarnings.length > 0 && (
+        <div style={{ marginBottom: "14px" }}>
+          <button
+            type="button"
+            className="text-button"
+            style={{
+              width: "100%",
+              borderColor: "rgba(225, 29, 72, 0.3)",
+              color: "var(--red)",
+              background: "var(--red-soft)",
+              justifyContent: "center"
+            }}
+            onClick={() => setShowSwipePanel(true)}
+          >
+            <ShieldAlert size={16} /> Verify Warning Signs ({pendingWarnings.length} pending)
+          </button>
+        </div>
+      )}
+
       <div className="switch-row">
         <label>
           <input
@@ -177,6 +245,22 @@ export function IntakePanel({ intake, scenarioSelection, onChange, onLoadScenari
             onChange={(event) => update("consentToStore", event.target.checked)}
           />
           Consent to store locally
+        </label>
+      </div>
+
+      <div className="switch-row" style={{ marginTop: "14px", paddingTop: "14px", borderTop: "1px solid var(--line)" }}>
+        <label style={{ color: "var(--red)", display: "inline-flex", alignItems: "center", gap: "8px" }}>
+          <input
+            type="checkbox"
+            checked={isHybridMode}
+            onChange={(event) => {
+              setIsHybridMode(event.target.checked);
+              if (event.target.checked) {
+                setShowSwipePanel(true);
+              }
+            }}
+          />
+          Experimental: Hybrid CFT Mode
         </label>
       </div>
     </section>

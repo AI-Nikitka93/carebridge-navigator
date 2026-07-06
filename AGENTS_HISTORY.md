@@ -1,3 +1,9 @@
+### 2026-07-06 22:01:00 +0300 — Имплементация "Swipe Mode" (Hybrid CFT)
+- Changed: Реализован гибридный режим когнитивного трения (CFT). Написан легковесный хук useSwipeGesture.ts с поддержкой Pointer Events и эффектом вязкого прилипания при flick-жестах. Создан 3D-компонент SwipeTriagePanel.tsx с поддержкой Velocity Sentinel (блокировка при частых свайпах), отменой жестов (Backspace/Undo) и кнопочными дублерами. Режим интегрирован в IntakePanel.tsx вместе с переключателем Hybrid CFT Mode.
+- Files: src/hooks/useSwipeGesture.ts, src/components/SwipeTriagePanel.tsx, src/components/IntakePanel.tsx, src/styles.css
+- Verification: Запущен полный проверочный цикл npm run check:release (Exit Code 0).
+- Status: DONE
+
 ### 2026-07-06 21:41:00 +0300 — Настройка деплоя в GitHub Pages
 - Changed: Добавлен GitHub Actions workflow для деплоя через Vite (actions/configure-pages, actions/upload-pages-artifact, actions/deploy-pages). Обновлен vite.config.ts (добавлен base: './' для поддержки относительных путей на GitHub Pages). Сделан коммит.
 - Files: .github/workflows/deploy.yml, vite.config.ts
