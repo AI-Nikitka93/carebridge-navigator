@@ -55,7 +55,7 @@ export const DEVPOST_SCORING_EVIDENCE: SubmissionCriterionEvidence[] = [
       {
         sourcePath: "scripts/check-public-repo.mjs",
         proof:
-          "Post-public gate is ready to verify public visibility, repository description/topics, README-free source, expected public HEAD, and hosted Actions after the account-linked repository push.",
+          "Post-public gate is ready to verify public visibility, repository description/topics, GitHub-recognized MIT license, README-free source, expected public HEAD, and hosted Actions after the account-linked repository push.",
         status: "public_verification_required",
       },
     ],

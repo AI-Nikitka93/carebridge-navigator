@@ -47,6 +47,9 @@ describe("submission evidence ledger", () => {
     expect(
       githubEvidence.evidence.find((item) => item.sourcePath === "scripts/check-public-repo.mjs")?.proof,
     ).toContain("repository description/topics");
+    expect(
+      githubEvidence.evidence.find((item) => item.sourcePath === "scripts/check-public-repo.mjs")?.proof,
+    ).toContain("GitHub-recognized MIT license");
     expect(REQUIRED_POST_PUBLIC_CHECKS).toContain(
       "Create the public GitHub repository from the committed source without GitHub's auto README option.",
     );

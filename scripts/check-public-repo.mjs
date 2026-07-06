@@ -23,6 +23,7 @@ export const REQUIRED_PUBLIC_FILES = [
 ];
 
 export const EXPECTED_PUBLIC_DESCRIPTION = "Offline-first SDG 3 care-navigation app for community health workers.";
+export const EXPECTED_LICENSE_SPDX_ID = "MIT";
 
 export const REQUIRED_PUBLIC_TOPICS = [
   "care-navigation",
@@ -164,6 +165,11 @@ export async function inspectPublicRepository({
     errors.push(`Repository description must be: ${EXPECTED_PUBLIC_DESCRIPTION}`);
   }
 
+  const publicLicenseSpdxId = repository.license?.spdx_id ?? "missing";
+  if (publicLicenseSpdxId !== EXPECTED_LICENSE_SPDX_ID) {
+    errors.push(`Repository license must be recognized by GitHub as MIT, current SPDX id is ${publicLicenseSpdxId}.`);
+  }
+
   const repositoryTopics = new Set((repository.topics ?? []).map((topic) => topic.toLowerCase()));
   const missingTopics = REQUIRED_PUBLIC_TOPICS.filter((topic) => !repositoryTopics.has(topic));
   if (missingTopics.length > 0) {
@@ -224,6 +230,7 @@ export async function inspectPublicRepository({
     publicHeadSha,
     publicFileCount: publicPaths.length,
     publicDescription: repository.description ?? "",
+    publicLicenseSpdxId,
     publicTopics: [...repositoryTopics].sort(),
     latestQualityRun,
     errors,

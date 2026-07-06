@@ -68,6 +68,9 @@ describe("public repository gate helpers", () => {
           archived: false,
           default_branch: "main",
           description: EXPECTED_PUBLIC_DESCRIPTION,
+          license: {
+            spdx_id: "MIT",
+          },
           topics: REQUIRED_PUBLIC_TOPICS,
         });
       }
@@ -112,6 +115,9 @@ describe("public repository gate helpers", () => {
           archived: false,
           default_branch: "main",
           description: "Generic health demo",
+          license: {
+            spdx_id: "NOASSERTION",
+          },
           topics: ["react", "typescript"],
         });
       }
@@ -146,5 +152,50 @@ describe("public repository gate helpers", () => {
     expect(report.errors).toContain(
       "Repository is missing required topics: care-navigation, community-health, offline-first, public-health, sdg-3, universal-health-coverage, vite",
     );
+  });
+
+  it("rejects a public repository when GitHub does not recognize the MIT license", async () => {
+    const githubOrigin = "https:" + "//github.com";
+    const expectedCommit = "abc1234567890";
+    const fetchImpl = async (url) => {
+      if (url.endsWith("/repos/AI-Nikitka93/carebridge-navigator")) {
+        return jsonResponse({
+          private: false,
+          visibility: "public",
+          archived: false,
+          default_branch: "main",
+          description: EXPECTED_PUBLIC_DESCRIPTION,
+          license: {
+            spdx_id: "NOASSERTION",
+          },
+          topics: REQUIRED_PUBLIC_TOPICS,
+        });
+      }
+
+      if (url.includes("/git/trees/main")) {
+        return jsonResponse({
+          tree: REQUIRED_PUBLIC_FILES.map((path) => ({
+            type: "blob",
+            path,
+          })),
+        });
+      }
+
+      if (url.endsWith("/commits/main")) {
+        return jsonResponse({
+          sha: expectedCommit,
+        });
+      }
+
+      throw new Error(`Unexpected test URL: ${url}`);
+    };
+
+    const report = await inspectPublicRepository({
+      repoUrl: `${githubOrigin}/AI-Nikitka93/carebridge-navigator`,
+      expectedCommit,
+      fetchImpl,
+    });
+
+    expect(report.errors).toContain("Repository license must be recognized by GitHub as MIT, current SPDX id is NOASSERTION.");
   });
 });
