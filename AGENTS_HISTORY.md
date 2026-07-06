@@ -1,3 +1,9 @@
+### 2026-07-06 22:46:00 +0300 — Разрешение конфликта peer dependencies в CI/CD workflows
+- Changed: Добавлен флаг --legacy-peer-deps в команды установки npm в GitHub Actions workflows (quality.yml и deploy.yml), чтобы предотвратить сбои при установке зависимостей на CI.
+- Files: .github/workflows/quality.yml, .github/workflows/deploy.yml
+- Verification: Успешно запущен полный локальный цикл npm run check:release (Exit Code 0).
+- Status: DONE
+
 ### 2026-07-06 22:01:00 +0300 — Имплементация "Swipe Mode" (Hybrid CFT)
 - Changed: Реализован гибридный режим когнитивного трения (CFT). Написан легковесный хук useSwipeGesture.ts с поддержкой Pointer Events и эффектом вязкого прилипания при flick-жестах. Создан 3D-компонент SwipeTriagePanel.tsx с поддержкой Velocity Sentinel (блокировка при частых свайпах), отменой жестов (Backspace/Undo) и кнопочными дублерами. Режим интегрирован в IntakePanel.tsx вместе с переключателем Hybrid CFT Mode.
 - Files: src/hooks/useSwipeGesture.ts, src/components/SwipeTriagePanel.tsx, src/components/IntakePanel.tsx, src/styles.css
